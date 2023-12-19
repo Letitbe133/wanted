@@ -26,21 +26,45 @@ getPartial('header', $metadata);
 
             // construction de la requête
             $query = 'INSERT INTO category (title) VALUES(:title);';
+            $data = ['title' => $title];
+
+            if ('update' === $action) {
+                $query = 'UPDATE category SET title = :title WHERE id=:id;';
+                $data = [
+                    'title' => $title,
+                    'id' => $id,
+                ];
+            }
 
             // tableau associatif contenant les marqueurs / values
-            $data = ['title' => $title];
 
             // exécution de la requête
             $lastInsertedId = prepareAndExecute($query, $data, true);
 
-            debug($lastInsertedId);
+            // debug($lastInsertedId);
+            header('Location:/wanted/categories.php');
         }
     }
 
-    // test d'une requête en SELECT
-    $results = prepareAndExecute('SELECT * FROM category')->fetchAll();
+    if (isset($_GET['action'], $_GET['id'])) {
+        extract($_GET);
 
-debug($results);
+        if ('update' === $action) {
+            $query = 'SELECT * FROM category WHERE id=:id';
+            $cat = prepareAndExecute($query, ['id' => $id])->fetch();
+        }
+
+        if ('delete' === $action) {
+            $query = 'DELETE FROM category WHERE id = :id;';
+            $data = [
+                'id' => $id,
+            ];
+            prepareAndExecute($query, $data);
+            header('Location:/wanted/categories.php');
+        }
+
+        // debug($cat);
+    }
 
 ?>
 
@@ -48,11 +72,47 @@ debug($results);
     <form action="" method="POST">
         <div class="mb-3">
             <label for="categoryTitle" class="form-label">Nom de la catégorie</label>
-            <input type="text" class="form-control" name="title" id="categoryTitle" aria-describedby="categoryHelp">
+            <input type="text" class="form-control" name="title" id="categoryTitle" aria-describedby="categoryHelp"
+                value="<?php echo $cat['title'] ?? ''; ?>">
             <div id="categoryHelp" class="form-text">Entrez le nom de la catégorie à ajouter</div>
         </div>
-        <input type="submit" name="submit" class="btn btn-primary" value="Ajouter">
+
+        <input type="hidden" name="action"
+            value="<?php echo $action ?? ''; ?>">
+        <input type="hidden" name="id"
+            value="<?php echo $id ?? ''; ?>">
+
+
+        <input type="submit" name="submit" class="btn btn-primary"
+            value="<?php echo 'update' === $action ? 'Modifier' : 'Ajouter'; ?>">
     </form>
+</div>
+
+<?php
+// test d'une requête en SELECT
+    $results = prepareAndExecute('SELECT * FROM category')->fetchAll();
+
+// debug($results);
+
+?>
+
+
+<div class="container mt-5">
+    <h2>Liste des catégories</h2>
+    <ul class="list-group">
+        <?php
+            foreach ($results as $category) {
+                echo "
+                <li class='list-group-item d-flex justify-content-between'>{$category['title']}
+                    <div class='d-flex gap-3' role='group' aria-label='Liste des catégories'>
+                        <a href='/wanted/categories.php?action=update&id={$category['id']}' class='btn btn-warning'>Modifier</a>
+                        <a id='deleteBtn' href='/wanted/categories.php?action=delete&id={$category['id']}' class='btn btn-danger'>Supprimer</a>
+                    </div>
+                </li>
+                ";
+            }
+?>
+    </ul>
 </div>
 
 <?php

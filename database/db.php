@@ -2,6 +2,11 @@
 
 require_once './config/init.php';
 
+/**
+ * retourne une instance de la classe PDO.
+ *
+ * @return PDO
+ */
 function getDb()
 {
     try {
@@ -17,6 +22,15 @@ function getDb()
 
 // new PDO('mysql:host=localhost;dbname=wanted;port=3306', 'root', '');
 
+/**
+ * prépare et exécute une requête passée à paramètre.
+ *
+ * @param string $query
+ * @param array  $values
+ * @param bool   $lastId
+ *
+ * @return mixed
+ */
 function prepareAndExecute($query, $values = null, $lastId = false)
 {
     // on se connecte à la BDD
@@ -26,13 +40,14 @@ function prepareAndExecute($query, $values = null, $lastId = false)
     $pdoStatement = $pdo->prepare($query);
 
     // on exécute la requête
-    $pdoStatement->execute($values);
+    // si l'exécution est ok on retourne le résultat
+    if ($pdoStatement->execute($values)) {
+        // si lastId vaut true on retourne l'id du dernier élément inséré
+        if (true === $lastId) {
+            return $pdo->lastInsertId();
+        }
 
-    // si lastId vaut true on retourne l'id du dernier élément inséré
-    if (true === $lastId) {
-        return $pdo->lastInsertId();
+        // sinon on retourne l'instance de PDOStatement
+        return $pdoStatement;
     }
-
-    // sinon on retourne l'instance de PDOStatement
-    return $pdoStatement;
 }
