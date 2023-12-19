@@ -16,3 +16,23 @@ function getDb()
 }
 
 // new PDO('mysql:host=localhost;dbname=wanted;port=3306', 'root', '');
+
+function prepareAndExecute($query, $values = null, $lastId = false)
+{
+    // on se connecte à la BDD
+    $pdo = getDb();
+
+    // on prépare la requête
+    $pdoStatement = $pdo->prepare($query);
+
+    // on exécute la requête
+    $pdoStatement->execute($values);
+
+    // si lastId vaut true on retourne l'id du dernier élément inséré
+    if (true === $lastId) {
+        return $pdo->lastInsertId();
+    }
+
+    // sinon on retourne l'instance de PDOStatement
+    return $pdoStatement;
+}

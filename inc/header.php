@@ -27,6 +27,15 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/wanted/contact.php">Contact</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Back Ofice
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/wanted/categories.php">Catégories</a></li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/wanted/dashboard.php">Dashboard</a>
                     </li>
